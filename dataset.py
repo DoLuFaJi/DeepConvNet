@@ -59,4 +59,4 @@ class ToTensor(object):
         # image.transpose((2,0,1))
         image = image[None, :]
         return {'image': torch.from_numpy(image),
-                'is_face': is_face}
+                'is_face': int(is_face[0])}
