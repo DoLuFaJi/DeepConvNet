@@ -6,23 +6,25 @@ class Net(nn.Module):
         super(Net, self).__init__()
         # 1 input image channel, 6 output channels, 5x5 square convolution
         # kernel
-        self.conv1 = nn.Conv2d(1, 6, 5)
-        self.conv2 = nn.Conv2d(6, 16, 5)
+        self.conv1 = nn.Conv2d(1, 6, 6)
+        self.conv2 = nn.Conv2d(6, 16, 6)
         # an affine operation: y = Wx + b
-        self.fc1 = nn.Linear(16 * 5 * 5, 120)
+        self.fc1 = nn.Linear(400, 120)
         self.fc2 = nn.Linear(120, 84)
         # 2 outputs pas 10
-        self.fc3 = nn.Linear(84, 10)
+        self.fc3 = nn.Linear(84, 2)
 
     def forward(self, x):
-        import pdb; pdb.set_trace()
         # Max pooling over a (2, 2) window
         x = F.max_pool2d(F.relu(self.conv1(x)), (2, 2))
         # If the size is a square you can only specify a single number
         x = F.max_pool2d(F.relu(self.conv2(x)), 2)
         x = x.view(-1, self.num_flat_features(x))
+        print(x.size())
         x = F.relu(self.fc1(x))
+        print(x.size())
         x = F.relu(self.fc2(x))
+        print(x.size())
         x = self.fc3(x)
         return x
 

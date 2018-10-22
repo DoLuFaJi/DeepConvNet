@@ -33,7 +33,9 @@ for i, data in enumerate(trainloader, 0):
     # zero the parameter gradients
     optimizer.zero_grad()
     # forward + backward + optimize
-    outputs = net(inputs)
+    # import pdb
+    # pdb.set_trace()
+    outputs = net(inputs.float())
     loss = criterion(outputs, labels)
     loss.backward()
     optimizer.step()
