@@ -20,11 +20,8 @@ class Net(nn.Module):
         # If the size is a square you can only specify a single number
         x = F.max_pool2d(F.relu(self.conv2(x)), 2)
         x = x.view(-1, self.num_flat_features(x))
-        print(x.size())
         x = F.relu(self.fc1(x))
-        print(x.size())
         x = F.relu(self.fc2(x))
-        print(x.size())
         x = self.fc3(x)
         return x
 

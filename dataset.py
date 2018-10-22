@@ -10,13 +10,15 @@ class FaceDataset(Dataset):
         self.train_dir = TRAIN_DATA
         self.train_file = open(CLASSIFIED_TRAIN_DATA, 'r')
         self.number_of_files = os.listdir(TRAIN_DATA_FACE) + os.listdir(TRAIN_DATA_NOT_FACE)
+        self.lines = self.train_file.readlines()
         self.transform = transform
 
     def __len__(self):
         return len(self.number_of_files)
 
     def __getitem__(self, index):
-        img_name, is_face = self.train_file.readline(index).split(' ')
+        img_name, is_face = self.lines[index].split(' ')
+
         image = io.imread(os.path.join(TRAIN_DATA, img_name))
         sample = {'image': image, 'is_face': is_face}
         if self.transform:

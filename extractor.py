@@ -27,6 +27,7 @@ optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
 
 # here used to go through dataset twice, but eof, must reset dataset
 running_loss = 0.0
+epoch = 0
 for i, data in enumerate(trainloader, 0):
     # get the inputs
     inputs, labels = data['image'], data['is_face']
