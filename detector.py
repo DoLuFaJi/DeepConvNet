@@ -11,6 +11,7 @@ class Net(nn.Module):
         # an affine operation: y = Wx + b
         self.fc1 = nn.Linear(16 * 5 * 5, 120)
         self.fc2 = nn.Linear(120, 84)
+        # 2 outputs pas 10
         self.fc3 = nn.Linear(84, 10)
 
     def forward(self, x):

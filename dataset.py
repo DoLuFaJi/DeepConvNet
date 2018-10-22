@@ -1,4 +1,5 @@
 import os
+import torch
 from skimage import io
 from torch.utils.data import Dataset
 
@@ -54,7 +55,8 @@ class ToTensor(object):
         # torch image: C X H X W
         # add dimension ?
         # https://discuss.pytorch.org/t/expected-4d-tensor-as-input-got-3d-tensor-instead/6447/2
-        print(image)
-        image = image.transpose((2, 0, 1))
+        # rip transpose
+        # image.transpose((2,0,1))
+        image = image[None, :]
         return {'image': torch.from_numpy(image),
-                'is_face': torch.from_numpy(is_face)}
+                'is_face': is_face}
