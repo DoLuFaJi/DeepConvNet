@@ -10,7 +10,7 @@ from settings import TRAIN_DATA_FACE, TRAIN_DATA_NOT_FACE, TEST_DATA_GOOGLE
 
 trainset = FaceDataset(transform=torchvision.transforms.Compose([ToTensor()]))
 
-trainloader = torch.utils.data.DataLoader(trainset, batch_size=4,
+trainloader = torch.utils.data.DataLoader(trainset, batch_size=8,
                                           shuffle=True, num_workers=2)
 
 testset = TestDataset(transform=torchvision.transforms.Compose([ToTensor()]))
@@ -48,20 +48,20 @@ for i, data in enumerate(trainloader, 0):
 
 print('Finished Training')
 
-
-dataiter = iter(testloader)
-images, labels = dataiter.next()
-
-# print images
-imshow(torchvision.utils.make_grid(images))
-print('GroundTruth: ', ' '.join('%5s' % classes[labels[j]] for j in range(4)))
-
-outputs = net(images)
-
-_, predicted = torch.max(outputs, 1)
-
-print('Predicted: ', ' '.join('%5s' % classes[predicted[j]]
-                              for j in range(4)))
+# Testing 1 image
+# dataiter = iter(testloader)
+# images, labels = dataiter.next()
+#
+# # print images
+# imshow(torchvision.utils.make_grid(images))
+# print('GroundTruth: ', ' '.join('%5s' % classes[labels[j]] for j in range(4)))
+#
+# outputs = net(images)
+#
+# _, predicted = torch.max(outputs, 1)
+#
+# print('Predicted: ', ' '.join('%5s' % classes[predicted[j]]
+#                               for j in range(4)))
 
 correct = 0
 total = 0
