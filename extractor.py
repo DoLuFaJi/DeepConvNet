@@ -7,26 +7,36 @@ from dataset import FaceDataset, TestDataset, ToTensor
 from detector import Net
 from settings import TRAIN_DATA_FACE, TRAIN_DATA_NOT_FACE, TEST_DATA_GOOGLE
 
+BATCH_SIZE = 1
+WORKERS = 2
+NB_ITERATIONS = 1
 
 trainset = FaceDataset(transform=torchvision.transforms.Compose([ToTensor()]))
 
-trainloader = torch.utils.data.DataLoader(trainset, batch_size=8,
-                                          shuffle=True, num_workers=2)
+trainloader = torch.utils.data.DataLoader(trainset, batch_size=BATCH_SIZE,
+                                          shuffle=True, num_workers=WORKERS)
 
 testset = TestDataset(transform=torchvision.transforms.Compose([ToTensor()]))
 
-testloader = torch.utils.data.DataLoader(testset, batch_size=4,
-                                         shuffle=False, num_workers=2)
+testloader = torch.utils.data.DataLoader(testset, batch_size=BATCH_SIZE,
+                                         shuffle=False, num_workers=WORKERS)
+
+validset = FaceDataset(transform=torchvision.transforms.Compose([ToTensor()]))
+
+validloader = torch.utils.data.DataLoader(validset, batch_size=BATCH_SIZE,
+                                         shuffle=False, num_workers=WORKERS)
+
 
 classes = ('NOT FACE', 'FACE')
 
 net = Net()
 
 criterion = nn.CrossEntropyLoss()
+# criterion = nn.NLLLoss()
 # lr is learning rate
 optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
 
-for epoch in range(2):
+for epoch in range(NB_ITERATIONS):
     running_loss = 0.0
     for i, data in enumerate(trainloader, 0):
         # get the inputs
@@ -35,6 +45,8 @@ for epoch in range(2):
         optimizer.zero_grad()
         # forward + backward + optimize
         outputs = net(inputs.float())
+        # _, preds = torch.max(outputs.data, 1)
+        # import pdb; pdb.set_trace()
         loss = criterion(outputs, labels)
         loss.backward()
         optimizer.step()
@@ -63,15 +75,61 @@ print('Finished Training')
 # print('Predicted: ', ' '.join('%5s' % classes[predicted[j]]
 #                               for j in range(4)))
 
+# import pdb; pdb.set_trace()
+
+net.eval()
+### VALID SET, same set as train set
 correct = 0
 total = 0
+# accruacy of each classes
+class_correct = list(0. for i in range(2))
+class_total = list(0. for i in range(2))
+with torch.no_grad():
+    for data in validloader:
+        images, labels = data['image'], data['is_face']
+        outputs = net(images.float())
+        _, predicted = torch.max(outputs.data, 1)
+        total += labels.size(0)
+        result = (predicted == labels).int()
+        correct += result.sum().item()
+        for i in range(len(labels)):
+            label = labels[i]
+            class_correct[label] += result[i].item()
+            class_total[label] += 1
+
+
+print('Accuracy of the network on the %d valid images: %d %% [%d / %d]' % (
+    len(validset), 100 * correct / total, correct, total) )
+
+for i in range(2):
+    print('Accuracy of %5s : %2d %% [%d / %d]' % (
+        classes[i], 100 * class_correct[i] / class_total[i], class_correct[i], class_total[i]))
+
+print('Starting test')
+### TEST SET, google x2, yale
+correct = 0
+total = 0
+# accruacy of each classes
+class_correct = list(0. for i in range(2))
+class_total = list(0. for i in range(2))
 with torch.no_grad():
     for data in testloader:
         images, labels = data['image'], data['is_face']
         outputs = net(images.float())
         _, predicted = torch.max(outputs.data, 1)
         total += labels.size(0)
-        correct += (predicted == labels).sum().item()
+        result = (predicted == labels).int()
+        correct += result.sum().item()
+        for i in range(len(labels)):
+            label = labels[i]
+            class_correct[label] += result[i].item()
+            class_total[label] += 1
 
-print('Accuracy of the network on the 10000 test images: %d %%' % (
-    100 * correct / total))
+
+print('Accuracy of the network on the %d test images: %d %% [%d / %d]' % (
+    len(testset),100 * correct / total, correct, total) )
+
+for i in range(2):
+    print('Accuracy of %5s : %2d %% [%d / %d]' % (
+        classes[i], 100 * class_correct[i] / class_total[i], class_correct[i], class_total[i]))
+import pdb; pdb.set_trace()
