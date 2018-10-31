@@ -24,6 +24,9 @@ class FaceDataset(Dataset):
             sample = self.transform(sample)
         return sample
 
+    def close(self):
+        self.train_file.close()
+
 
 class TestDataset(Dataset):
     def __init__(self, transform=None):
@@ -42,6 +45,9 @@ class TestDataset(Dataset):
         if self.transform:
             sample = self.transform(sample)
         return sample
+
+    def close(self):
+        self.train_file.close()
 
 class ToTensor(object):
     """Convert ndarrays in sample to Tensors."""
