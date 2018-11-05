@@ -1,16 +1,18 @@
 import os
 import torch
 from skimage import io
+from skimage import transform
 from torch.utils.data import Dataset
-
-from settings import TRAIN_DATA, CLASSIFIED_TRAIN_DATA, TRAIN_DATA_FACE, TRAIN_DATA_NOT_FACE, TEST_DATA_GOOGLE, CLASSIFIED_TEST_DATA_GOOGLE, TEST_DATA
+import numpy
+from settings import CLASSIFIED_TRAIN_DATA_RANDOMTEST, TRAIN_DATA, CLASSIFIED_TRAIN_DATA, CLASSIFIED_TRAIN_DATA_RANDOM, TRAIN_DATA_FACE, TRAIN_DATA_NOT_FACE, TEST_DATA_GOOGLE, CLASSIFIED_TEST_DATA_GOOGLE, TEST_DATA
 
 class FaceDataset(Dataset):
     def __init__(self, transform=None):
         self.train_dir = TRAIN_DATA
-        self.train_file = open(CLASSIFIED_TRAIN_DATA, 'r')
+        self.train_file = open(CLASSIFIED_TRAIN_DATA_RANDOM, 'r')
         self.lines = self.train_file.readlines()
         self.transform = transform
+        print("trainset")
 
     def __len__(self):
         return len(self.lines)
@@ -19,6 +21,7 @@ class FaceDataset(Dataset):
         img_name, is_face = self.lines[index].split(' ')
 
         image = io.imread(os.path.join(TRAIN_DATA, img_name))
+
         sample = {'image': image, 'is_face': is_face}
         if self.transform:
             sample = self.transform(sample)
@@ -34,6 +37,7 @@ class TestDataset(Dataset):
         self.train_file = open(CLASSIFIED_TEST_DATA_GOOGLE, 'r')
         self.lines = self.train_file.readlines()
         self.transform = transform
+        print("test")
 
     def __len__(self):
         return len(self.lines)
@@ -54,7 +58,6 @@ class ToTensor(object):
 
     def __call__(self, sample):
         image, is_face = sample['image'], sample['is_face']
-
         # swap color axis because
         # numpy image: H x W x C
         # torch image: C X H X W
@@ -65,3 +68,26 @@ class ToTensor(object):
         image = image[None, :]
         return {'image': torch.from_numpy(image),
                 'is_face': int(is_face[0])}
+
+class ValidDataset(Dataset):
+    def __init__(self, transform=None):
+        self.train_dir = TRAIN_DATA
+        self.train_file = open(CLASSIFIED_TRAIN_DATA_RANDOMTEST, 'r')
+        self.lines = self.train_file.readlines()
+        self.transform = transform
+        print("validset")
+
+    def __len__(self):
+        return len(self.lines)
+
+    def __getitem__(self, index):
+        img_name, is_face = self.lines[index].split(' ')
+
+        image = io.imread(os.path.join(TRAIN_DATA, img_name))
+        sample = {'image': image, 'is_face': is_face}
+        if self.transform:
+            sample = self.transform(sample)
+        return sample
+
+    def close(self):
+        self.train_file.close()
