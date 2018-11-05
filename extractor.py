@@ -2,30 +2,53 @@ import torch
 import torchvision
 import torch.nn as nn
 import torch.optim as optim
+from torch.optim import lr_scheduler
 
 from dataset import FaceDataset, TestDataset, ToTensor
 from detector import Net
-from settings import TRAIN_DATA_FACE, TRAIN_DATA_NOT_FACE, TEST_DATA_GOOGLE
+from settings import TRAIN_DATA_FACE, TRAIN_DATA_NOT_FACE, TEST_DATA_GOOGLE, \
+CLASSIFIED_TEST_DATA_GOOGLE, CLASSIFIED_TEST_DATA, CLASSIFIED_TEST_DATA_YALE, \
+CLASSIFIED_TEST_DATA_GOOGLE2, CLASSIFIED_TRAIN_DATA
 
-BATCH_SIZE = 4
+from run_test import run_test
+
+BATCH_SIZE = 10
 WORKERS = 2
-NB_ITERATIONS = 50
+NB_ITERATIONS = 1
+SCHEDULER = False
+
+# LEARNING_RATE = 0.000001
+LEARNING_RATE = 0.001
+# MOMENTUM = 0.2
+# MOMENTUM = 0.5
+MOMENTUM = 0.9
+
+
 
 trainset = FaceDataset(transform=torchvision.transforms.Compose([ToTensor()]))
-
 trainloader = torch.utils.data.DataLoader(trainset, batch_size=BATCH_SIZE,
                                           shuffle=True, num_workers=WORKERS)
 
-testset = TestDataset(transform=torchvision.transforms.Compose([ToTensor()]))
-
+testset = TestDataset(CLASSIFIED_TEST_DATA, transform=torchvision.transforms.Compose([ToTensor()]))
 testloader = torch.utils.data.DataLoader(testset, batch_size=BATCH_SIZE,
                                          shuffle=False, num_workers=WORKERS)
 
 validset = FaceDataset(transform=torchvision.transforms.Compose([ToTensor()]))
-
 validloader = torch.utils.data.DataLoader(validset, batch_size=BATCH_SIZE,
                                          shuffle=False, num_workers=WORKERS)
 
+
+yaleset = TestDataset(CLASSIFIED_TEST_DATA_YALE, transform=torchvision.transforms.Compose([ToTensor()]))
+yaleloader = torch.utils.data.DataLoader(yaleset, batch_size=BATCH_SIZE,
+                                         shuffle=False, num_workers=WORKERS)
+
+googleset = TestDataset(CLASSIFIED_TEST_DATA_GOOGLE, transform=torchvision.transforms.Compose([ToTensor()]))
+googleloader = torch.utils.data.DataLoader(googleset, batch_size=BATCH_SIZE,
+                                         shuffle=False, num_workers=WORKERS)
+
+googleset2 = TestDataset(CLASSIFIED_TEST_DATA_GOOGLE2, transform=torchvision.transforms.Compose([ToTensor()]))
+googleloader2 = torch.utils.data.DataLoader(googleset2, batch_size=BATCH_SIZE,
+                                         shuffle=False, num_workers=WORKERS)
 
 classes = ('NOT FACE', 'FACE')
 
@@ -34,7 +57,10 @@ net = Net()
 criterion = nn.CrossEntropyLoss()
 # criterion = nn.NLLLoss()
 # lr is learning rate
-optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.5)
+optimizer = optim.SGD(net.parameters(), lr=LEARNING_RATE, momentum=MOMENTUM)
+if SCHEDULER:
+    scheduler = lr_scheduler.StepLR(optimizer, step_size=5, gamma=0.1)
+
 train_data_size = len(trainset)
 for epoch in range(NB_ITERATIONS):
     running_loss = 0.0
@@ -42,6 +68,8 @@ for epoch in range(NB_ITERATIONS):
     loss_epoch = 0.0
     loss_epoch_input_size = 0.0
     correct_epoch = 0.0
+    if SCHEDULER:
+        scheduler.step()
     for i, data in enumerate(trainloader, 0):
         # get the inputs
         inputs, labels = data['image'], data['is_face']
@@ -75,78 +103,12 @@ for epoch in range(NB_ITERATIONS):
 
 print('Finished Training')
 trainset.close()
-
-# Testing 1 image
-# dataiter = iter(testloader)
-# images, labels = dataiter.next()
-#
-# # print images
-# imshow(torchvision.utils.make_grid(images))
-# print('GroundTruth: ', ' '.join('%5s' % classes[labels[j]] for j in range(4)))
-#
-# outputs = net(images)
-#
-# _, predicted = torch.max(outputs, 1)
-#
-# print('Predicted: ', ' '.join('%5s' % classes[predicted[j]]
-#                               for j in range(4)))
-
-# import pdb; pdb.set_trace()
-
 net.eval()
-### VALID SET, same set as train set
-correct = 0
-total = 0
-# accruacy of each classes
-class_correct = list(0. for i in range(2))
-class_total = list(0. for i in range(2))
-with torch.no_grad():
-    for data in validloader:
-        images, labels = data['image'], data['is_face']
-        outputs = net(images.float())
-        _, predicted = torch.max(outputs.data, 1)
-        total += labels.size(0)
-        result = (predicted == labels).int()
-        correct += result.sum().item()
-        for i in range(len(labels)):
-            label = labels[i]
-            class_correct[label] += result[i].item()
-            class_total[label] += 1
 
+run_test(validset, validloader, classes, net, 'VALID')
+run_test(yaleset, yaleloader, classes, net, 'YALE')
+run_test(googleset, googleloader, classes, net, 'GOOGLE')
+run_test(googleset2, googleloader2, classes, net, 'GOOGLE2')
+run_test(testset, testloader, classes, net, 'TEST')
 
-print('Accuracy of the network on the %d valid images: %d %% [%d / %d]' % (
-    len(validset), 100 * correct / total, correct, total) )
-
-for i in range(2):
-    print('Accuracy of %5s : %2d %% [%d / %d]' % (
-        classes[i], 100 * class_correct[i] / class_total[i], class_correct[i], class_total[i]))
-validset.close()
-print('Starting test')
-### TEST SET, google x2, yale
-correct = 0
-total = 0
-# accruacy of each classes
-class_correct = list(0. for i in range(2))
-class_total = list(0. for i in range(2))
-with torch.no_grad():
-    for data in testloader:
-        images, labels = data['image'], data['is_face']
-        outputs = net(images.float())
-        _, predicted = torch.max(outputs.data, 1)
-        total += labels.size(0)
-        result = (predicted == labels).int()
-        correct += result.sum().item()
-        for i in range(len(labels)):
-            label = labels[i]
-            class_correct[label] += result[i].item()
-            class_total[label] += 1
-
-
-print('Accuracy of the network on the %d test images: %d %% [%d / %d]' % (
-    len(testset),100 * correct / total, correct, total) )
-
-for i in range(2):
-    print('Accuracy of %5s : %2d %% [%d / %d]' % (
-        classes[i], 100 * class_correct[i] / class_total[i], class_correct[i], class_total[i]))
-testset.close()
 import pdb; pdb.set_trace()

@@ -8,14 +8,14 @@ class Net(nn.Module):
         super(Net, self).__init__()
         # 1 input image channel, 6 output channels, 5x5 square convolution
         # kernel
-        self.conv1 = nn.Conv2d(1, 6, 5)
-        self.conv2 = nn.Conv2d(6, 16, 5)
+        self.conv1 = nn.Conv2d(1, 4, 5)
+        self.conv2 = nn.Conv2d(4, 14, 3)
         # an affine operation: y = Wx + b
-        self.fc1 = nn.Linear(576, 120)
-        self.fc2 = nn.Linear(120, 84)
+        self.fc1 = nn.Linear(7*7*14, 84)
+        # self.fc2 = nn.Linear(120, 84)
         # 2 outputs pas 10
-        self.fc3 = nn.Linear(84, 10)
-        self.fc4 = nn.Linear(10, 2)
+        # self.fc3 = nn.Linear(84, 10)
+        self.fc4 = nn.Linear(84, 2)
 
     def forward(self, x):
         if DEBUG_FORWARD:
@@ -41,15 +41,16 @@ class Net(nn.Module):
 
         if DEBUG_FORWARD:
             print(x.size())
-        x = F.relu(self.fc2(x))
 
-        if DEBUG_FORWARD:
-            print(x.size())
-
-        x = F.relu(self.fc3(x))
-
-        if DEBUG_FORWARD:
-            print(x.size())
+        # x = F.relu(self.fc2(x))
+        #
+        # if DEBUG_FORWARD:
+        #     print(x.size())
+        #
+        # x = F.relu(self.fc3(x))
+        #
+        # if DEBUG_FORWARD:
+        #     print(x.size())
 
         x = self.fc4(x)
 
