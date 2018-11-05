@@ -26,8 +26,8 @@ def run_test(set, loader, classes, net, test_label):
                 if result[i].item() != 1:
                     not_detected[label].append(img_names[i])
 
-    print('%s: Accuracy of the network: %d %d %% [%d / %d]' % (
-        test_label, len(set), 100 * correct / total, correct, total))
+    print('%s: Accuracy of the network: %d %% [%d / %d]' % (
+        test_label, 100 * correct / total, correct, total))
 
     for i in range(2):
         if class_total[i] > 0:
@@ -43,4 +43,3 @@ def run_test(set, loader, classes, net, test_label):
         filename = test_label + '_' + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
         with open(filename, 'w') as file:
             file.write(str(not_detected))
-        
