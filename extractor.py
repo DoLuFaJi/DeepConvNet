@@ -2,9 +2,10 @@ import torch
 import torchvision
 import torch.nn as nn
 import torch.optim as optim
+import torchvision.transforms as tf
 from torch.optim import lr_scheduler
 
-from dataset import FaceDataset, TestDataset, ToTensor, ValidDataset
+from dataset import FaceDataset, TestDataset, ValidDataset
 from detector import Net
 from settings import TRAIN_DATA_FACE, TRAIN_DATA_NOT_FACE, TEST_DATA_GOOGLE, \
 CLASSIFIED_TEST_DATA_GOOGLE, CLASSIFIED_TEST_DATA, CLASSIFIED_TEST_DATA_YALE, \
@@ -14,39 +15,39 @@ from run_test import run_test
 
 BATCH_SIZE = 10
 WORKERS = 2
-NB_ITERATIONS = 1
+NB_ITERATIONS = 10
 SCHEDULER = False
 
 # LEARNING_RATE = 0.000001
 LEARNING_RATE = 0.001
 # MOMENTUM = 0.2
-# MOMENTUM = 0.5
-MOMENTUM = 0.9
+MOMENTUM = 0.5
+# MOMENTUM = 0.9
 
 
-
-trainset = FaceDataset(transform=torchvision.transforms.Compose([ToTensor()]))
+transform = tf.Compose([tf.RandomHorizontalFlip(), tf.ToTensor(), tf.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
+trainset = FaceDataset(transform=transform)
 trainloader = torch.utils.data.DataLoader(trainset, batch_size=BATCH_SIZE,
                                           shuffle=True, num_workers=WORKERS)
 
-testset = TestDataset(CLASSIFIED_TEST_DATA, transform=torchvision.transforms.Compose([ToTensor()]))
+testset = TestDataset(CLASSIFIED_TEST_DATA, transform=transform)
 testloader = torch.utils.data.DataLoader(testset, batch_size=BATCH_SIZE,
                                          shuffle=False, num_workers=WORKERS)
 
-validset = ValidDataset(transform=torchvision.transforms.Compose([ToTensor()]))
+validset = FaceDataset(transform=transform)
 validloader = torch.utils.data.DataLoader(validset, batch_size=BATCH_SIZE,
                                          shuffle=False, num_workers=WORKERS)
 
 
-yaleset = TestDataset(CLASSIFIED_TEST_DATA_YALE, transform=torchvision.transforms.Compose([ToTensor()]))
+yaleset = TestDataset(CLASSIFIED_TEST_DATA_YALE, transform=transform)
 yaleloader = torch.utils.data.DataLoader(yaleset, batch_size=BATCH_SIZE,
                                          shuffle=False, num_workers=WORKERS)
 
-googleset = TestDataset(CLASSIFIED_TEST_DATA_GOOGLE, transform=torchvision.transforms.Compose([ToTensor()]))
+googleset = TestDataset(CLASSIFIED_TEST_DATA_GOOGLE, transform=transform)
 googleloader = torch.utils.data.DataLoader(googleset, batch_size=BATCH_SIZE,
                                          shuffle=False, num_workers=WORKERS)
 
-googleset2 = TestDataset(CLASSIFIED_TEST_DATA_GOOGLE2, transform=torchvision.transforms.Compose([ToTensor()]))
+googleset2 = TestDataset(CLASSIFIED_TEST_DATA_GOOGLE2, transform=transform)
 googleloader2 = torch.utils.data.DataLoader(googleset2, batch_size=BATCH_SIZE,
                                          shuffle=False, num_workers=WORKERS)
 
