@@ -4,7 +4,7 @@ import torch.nn as nn
 import torch.optim as optim
 from torch.optim import lr_scheduler
 
-from dataset import FaceDataset, TestDataset, ToTensor
+from dataset import FaceDataset, TestDataset, ToTensor, ValidDataset
 from detector import Net
 from settings import TRAIN_DATA_FACE, TRAIN_DATA_NOT_FACE, TEST_DATA_GOOGLE, \
 CLASSIFIED_TEST_DATA_GOOGLE, CLASSIFIED_TEST_DATA, CLASSIFIED_TEST_DATA_YALE, \
@@ -33,7 +33,7 @@ testset = TestDataset(CLASSIFIED_TEST_DATA, transform=torchvision.transforms.Com
 testloader = torch.utils.data.DataLoader(testset, batch_size=BATCH_SIZE,
                                          shuffle=False, num_workers=WORKERS)
 
-validset = FaceDataset(transform=torchvision.transforms.Compose([ToTensor()]))
+validset = ValidDataset(transform=torchvision.transforms.Compose([ToTensor()]))
 validloader = torch.utils.data.DataLoader(validset, batch_size=BATCH_SIZE,
                                          shuffle=False, num_workers=WORKERS)
 
