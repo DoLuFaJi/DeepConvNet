@@ -25,7 +25,7 @@ MOMENTUM = 0.5
 # MOMENTUM = 0.9
 
 
-transform = tf.Compose([tf.RandomHorizontalFlip(), tf.ToTensor(), tf.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
+transform = tf.Compose([tf.RandomHorizontalFlip(), tf.RandomVerticalFlip(), tf.RandomRotation(90), tf.ToTensor(), tf.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
 trainset = FaceDataset(transform=transform)
 trainloader = torch.utils.data.DataLoader(trainset, batch_size=BATCH_SIZE,
                                           shuffle=True, num_workers=WORKERS)
@@ -64,6 +64,7 @@ if SCHEDULER:
 
 train_data_size = len(trainset)
 for epoch in range(NB_ITERATIONS):
+    print('Starting epoch ' + str(epoch))
     running_loss = 0.0
     running_corrects = 0.0
     loss_epoch = 0.0
