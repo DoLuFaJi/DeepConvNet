@@ -19,3 +19,18 @@ CLASSIFIED_TEST_DATA_GOOGLE2 = 'data/start_deep/google2_posneg.txt'
 CLASSIFIED_TEST_DATA_YALE = 'data/start_deep/yale_posneg.txt'
 
 SAVE_NOT_DETECTED = True
+SAVE_MODEL = True
+MODEL_DIR = 'models/'
+LOAD_MODEL = False
+
+SCHEDULER = False
+WORKERS = 1
+BATCH_SIZE = 1
+NB_ITERATIONS = 5
+MODEL_NAME = 'prof'
+
+# LEARNING_RATE = 0.000001
+LEARNING_RATE = 0.001
+# MOMENTUM = 0.2
+MOMENTUM = 0.5
+# MOMENTUM = 0.9
