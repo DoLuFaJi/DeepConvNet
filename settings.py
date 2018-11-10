@@ -8,6 +8,9 @@ CLASSIFIED_TRAIN_DATA = 'data/start_deep/posneg.txt'
 CLASSIFIED_TRAIN_DATA_RANDOM = 'data/start_deep/posneg_r.txt'
 CLASSIFIED_TRAIN_DATA_RANDOMTEST = 'data/start_deep/testposneg_r2'
 
+CLASSIFIED_TRAIN_DATA_55000 = 'data/start_deep/train55000.txt'
+CLASSIFIED_VALID_DATA_36000 = 'data/start_deep/valid36000'
+
 TEST_DATA = 'data/start_deep/'
 TEST_DATA_GOOGLE = 'test_images/googlefaces_test'
 TEST_DATA_GOOGLE_2 = 'test_images/google_images02_36x36'
@@ -25,9 +28,9 @@ LOAD_MODEL = False
 
 SCHEDULER = False
 WORKERS = 1
-BATCH_SIZE = 1
-NB_ITERATIONS = 5
-MODEL_NAME = 'prof'
+BATCH_SIZE = 10
+NB_ITERATIONS = 10
+MODEL_NAME = 'autostop'
 
 # LEARNING_RATE = 0.000001
 LEARNING_RATE = 0.001
