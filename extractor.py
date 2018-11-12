@@ -111,4 +111,5 @@ run_test(googleset, googleloader, classes, net, 'GOOGLE')
 run_test(googleset2, googleloader2, classes, net, 'GOOGLE2')
 run_test(testset, testloader, classes, net, 'TEST')
 
-import pdb; pdb.set_trace()
+from detectinimage import searchfaces
+searchfaces(net)

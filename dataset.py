@@ -72,3 +72,25 @@ class ValidDataset(Dataset):
 
     def close(self):
         self.train_file.close()
+
+class UnknownDataset(Dataset):
+    def __init__(self, test_dir, test_file, transform=None):
+        self.test_dir = test_dir
+        self.test_file = open(test_file, 'r')
+        self.lines = self.test_file.readlines()
+        self.transform = transform
+
+    def __len__(self):
+        return len(self.lines)
+
+    def __getitem__(self, index):
+        img_name = self.lines[index]
+        img_name = img_name[:-1]
+        image = Image.open(os.path.join(self.test_dir, img_name))
+        if self.transform:
+            image = self.transform(image)
+        sample = {'image': image, 'image_name': img_name}
+        return sample
+
+    def close(self):
+        self.test_file.close()
