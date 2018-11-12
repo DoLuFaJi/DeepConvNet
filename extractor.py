@@ -164,9 +164,9 @@ if LOAD_MODEL:
     else:
         name = make_name(LEARNING_RATE, MOMENTUM, NB_ITERATIONS, BATCH_SIZE, MODEL_NAME)
     best_model = torch.load(name)
-if name is None:
-    name = make_name(LEARNING_RATE, MOMENTUM, NB_ITERATIONS, BATCH_SIZE, MODEL_NAME)
-print('Result for ' + name)
+    print('Result for ' + name)
+else:
+    print('Result for ' + make_name(LEARNING_RATE, MOMENTUM, NB_ITERATIONS, BATCH_SIZE, MODEL_NAME))
 if net is None:
     net = Net()
     if USE_TUTO:
