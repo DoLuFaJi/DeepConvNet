@@ -16,16 +16,22 @@ from settings import TRAIN_DATA_FACE, TRAIN_DATA_NOT_FACE, TEST_DATA_GOOGLE, \
 CLASSIFIED_TEST_DATA_GOOGLE, CLASSIFIED_TEST_DATA, CLASSIFIED_TEST_DATA_YALE, \
 CLASSIFIED_TEST_DATA_GOOGLE2, CLASSIFIED_TRAIN_DATA, SAVE_MODEL, MODEL_DIR, \
 LOAD_MODEL, BATCH_SIZE, MOMENTUM, LEARNING_RATE, WORKERS, NB_ITERATIONS, \
-SCHEDULER, MODEL_NAME, TRAIN_DATA, TEST_DATA, USE_TUTO, CLASSIFIED_TEST_DATA_FACE, CLASSIFIED_TEST_DATA_OTHER,\
-CLASSIFIED_TRAIN_DATA_55000, CLASSIFIED_VALID_DATA_36000
+SCHEDULER, MODEL_NAME, TRAIN_DATA, TEST_DATA, USE_TUTO, LOAD_MODEL_NAME,\
+CLASSIFIED_TRAIN_DATA_55000, CLASSIFIED_VALID_DATA_36000\
+IMAGE_PATH, CONFIDENCE
 
 arg_parser = argparse.ArgumentParser()
-arg_parser.add_argument('-b', type=int)
-arg_parser.add_argument('-lr', type=float)
-arg_parser.add_argument('-m', type=float)
-arg_parser.add_argument('-i', type=int)
-arg_parser.add_argument('-n', type=str)
-arg_parser.add_argument('-t', type=int)
+arg_parser.add_argument('-b', help='Batch size', type=int)
+arg_parser.add_argument('-lr',help='Learning rate', type=float)
+arg_parser.add_argument('-m', help='Momentum', type=float)
+arg_parser.add_argument('-i', help='Iterations', type=int)
+arg_parser.add_argument('-n', help='Model name', type=str)
+arg_parser.add_argument('-l', help='Load model', type=str)
+arg_parser.add_argument('-t', help='Use pytorch tutorial net', type=int)
+
+arg_parser.add_argument('-d', help='Detect faces in an image (path)', type=str)
+arg_parser.add_argument('-c', help='confidence when searching face in detetector', type=int)
+
 
 args = arg_parser.parse_args()
 if args.b is not None:
@@ -40,9 +46,18 @@ if args.n is not None:
     MODEL_NAME = args.n
 if args.t is not None:
     USE_TUTO = (args.t == 1)
+if args.l is not None:
+    LOAD_MODEL = True
+    LOAD_MODEL_NAME = args.l
+
+detecteur_image = false
+if args.d is not None:
+    IMAGE_PATH = (args.d == 1)
+    detecteur_image = true
+if args.c is not None:
+    CONFIDENCE = (args.c == 1)
 
 transform = tf.Compose([tf.RandomHorizontalFlip(), tf.RandomVerticalFlip(), tf.RandomRotation(90), tf.ColorJitter(brightness=0.5, contrast=0.75, saturation=0, hue=0), tf.ToTensor(), tf.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
-# transform = tf.Compose([tf.RandomHorizontalFlip(), tf.RandomVerticalFlip(), tf.RandomRotation(90), tf.ColorJitter(brightness=0.5, contrast=0.75, saturation=0, hue=0)])
 
 transform_test = tf.Compose([tf.ToTensor(), tf.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
 
@@ -74,17 +89,7 @@ googleset2 = TestDataset(TEST_DATA, CLASSIFIED_TEST_DATA_GOOGLE2, transform=tran
 googleloader2 = torch.utils.data.DataLoader(googleset2, batch_size=BATCH_SIZE,
                                          shuffle=False, num_workers=WORKERS)
 
-
-# faceset = TestDataset(TEST_DATA, CLASSIFIED_TEST_DATA_FACE, transform=transform_test)
-# faceloader = torch.utils.data.DataLoader(faceset, batch_size=BATCH_SIZE,
-#                                          shuffle=False, num_workers=WORKERS)
-#
-# otherset = TestDataset(TEST_DATA, CLASSIFIED_TEST_DATA_OTHER, transform=transform_test)
-# otherloader = torch.utils.data.DataLoader(otherset, batch_size=BATCH_SIZE,
-#                                          shuffle=False, num_workers=WORKERS)
 classes = ('NOT FACE', 'FACE')
-
-# show_dataset(trainset)
 net = None
 if not LOAD_MODEL:
     net = Net()
@@ -166,28 +171,30 @@ if not LOAD_MODEL:
 trainset.close()
 
 if LOAD_MODEL:
-    best_model = torch.load(make_name(LEARNING_RATE, MOMENTUM, NB_ITERATIONS, BATCH_SIZE, MODEL_NAME))
-print('Result for ' + make_name(LEARNING_RATE, MOMENTUM, NB_ITERATIONS, BATCH_SIZE, MODEL_NAME))
-if net is not None:
-    net.eval()
-    # run_test(ttset, ttloader, classes, net, 'TRAINSET')
-    # run_test(yaleset, yaleloader, classes, net, 'YALE')
-    # run_test(googleset, googleloader, classes, net, 'GOOGLE')
-    # run_test(googleset2, googleloader2, classes, net, 'GOOGLE2')
-    # run_test(testset, testloader, classes, net, 'TEST')
+    if LOAD_MODEL_NAME is not '':
+        name = LOAD_MODEL_NAME
+    else:
+        name = make_name(LEARNING_RATE, MOMENTUM, NB_ITERATIONS, BATCH_SIZE, MODEL_NAME)
+    best_model = torch.load(name)
+    print('Result for ' + name)
 else:
+    print('Result for ' + make_name(LEARNING_RATE, MOMENTUM, NB_ITERATIONS, BATCH_SIZE, MODEL_NAME))
+if net is None:
     net = Net()
     if USE_TUTO:
         net = NetTuto()
-print('')
-print('BEST MODEL')
-print('')
-net.load_state_dict(best_model)
-run_test(ttset, ttloader, classes, net, 'TRAINSET')
-run_test(yaleset, yaleloader, classes, net, 'YALE')
-run_test(googleset, googleloader, classes, net, 'GOOGLE')
-run_test(googleset2, googleloader2, classes, net, 'GOOGLE2')
-run_test(testset, testloader, classes, net, 'TEST')
+net.eval()
 
-from detectinimage import searchfaces
-searchfaces(net)
+if detecteur_image:
+    from detectinimage import searchfaces
+    searchfaces(net)
+
+else:
+    print('BEST MODEL')
+    print('')
+    net.load_state_dict(best_model)
+    run_test(ttset, ttloader, classes, net, 'TRAINSET')
+    run_test(yaleset, yaleloader, classes, net, 'YALE')
+    run_test(googleset, googleloader, classes, net, 'GOOGLE')
+    run_test(googleset2, googleloader2, classes, net, 'GOOGLE2')
+    run_test(testset, testloader, classes, net, 'TEST')

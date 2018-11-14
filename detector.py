@@ -20,7 +20,6 @@ class Net(nn.Module):
     def forward(self, x):
         if DEBUG_FORWARD:
             print(x.size())
-
         # Max pooling over a (2, 2) window
         x = F.max_pool2d(F.relu(self.conv1(x)), (2, 2))
 

@@ -21,25 +21,23 @@ CLASSIFIED_TEST_DATA = 'data/start_deep/testposneg.txt'
 CLASSIFIED_TEST_DATA_GOOGLE = 'data/start_deep/google_posneg.txt'
 CLASSIFIED_TEST_DATA_GOOGLE2 = 'data/start_deep/google2_posneg.txt'
 CLASSIFIED_TEST_DATA_YALE = 'data/start_deep/yale_posneg.txt'
-CLASSIFIED_TEST_DATA_FACE = 'data/start_deep/face_posneg'
-CLASSIFIED_TEST_DATA_OTHER = 'data/start_deep/posneg_other'
 
 USE_TUTO = False
 SAVE_NOT_DETECTED = False
 SAVE_MODEL = False
 MODEL_DIR = 'models/'
-LOAD_MODEL = True
+LOAD_MODEL = False
+LOAD_MODEL_NAME = ''
 
 SCHEDULER = False
 WORKERS = 1
 BATCH_SIZE = 16
-NB_ITERATIONS = 50
-MODEL_NAME = 'autostop'
+NB_ITERATIONS = 30
+MODEL_NAME = 'project_over'
 
-# LEARNING_RATE = 0.000001
 LEARNING_RATE = 0.01
 # MOMENTUM = 0.2
-MOMENTUM = 0.5
+MOMENTUM = 0.2
 #MOMENTUM = 0.9
 
 IMAGE_PATH = "./bigimage/nasa.jpg"
