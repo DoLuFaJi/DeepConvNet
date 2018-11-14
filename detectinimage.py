@@ -10,6 +10,8 @@ from dataset import UnknownDataset
 import shutil
 from shutil import copyfile
 
+from settings import IMAGE_PATH, CONFIDENCE
+
 step = 4
 scale = 1.2
 def long_slice(image_path, out_name, outdir, slice_size, net):
@@ -53,37 +55,41 @@ def long_slice(image_path, out_name, outdir, slice_size, net):
 
         with torch.no_grad():
             N = 0
-            confidence = 0.80
             for data in testloader:
                 images, img_names = data['image'], data['image_name']
                 outputs = net(images.float())
                 _, predicted = torch.max(outputs.data, 1)
-                if predicted==1 and outputs[0][1]-outputs[0][0]>2 :
-                    print(img_names)
-                    print(outputs)
-                    N += 1
-                    #dessiner carre sur image
-                    slh = int(img_names[0].split('_')[4])
-                    slw = int(img_names[0].split('_')[5][:-4])
-                    x1 = int(slh * slice_size / step)
-                    x2 = x1 + slice_size
-                    y1 = int(slw * slice_size / step)
-                    y2 = y1 + slice_size
+                # print(predicted)
+                if max(predicted) == 1 :
+                    ite = -1
+                    for predic in predicted :
+                        ite += 1
+                        if predic == 1 and outputs[ite][1]-outputs[ite][0] > CONFIDENCE:
+                            print(img_names[ite])
+                            # print(outputs)
+                            N += 1
+                            #dessiner carre sur image
+                            slh = int(img_names[ite].split('_')[4])
+                            slw = int(img_names[ite].split('_')[5][:-4])
+                            x1 = int(slh * slice_size / step)
+                            x2 = x1 + slice_size
+                            y1 = int(slw * slice_size / step)
+                            y2 = y1 + slice_size
 
-                    if slh == 16 and slw == 27 and width ==450 :
-                        print (x1, y1, x2, y2)
+                            if slh == 16 and slw == 27 and width ==450 :
+                                print (x1, y1, x2, y2)
 
-                    print(r)
-                    rh = orh / height
-                    rw = orw / width
-                    x1 = x1 * rh
-                    x2 = x2 * rh
-                    y1 = y1 * rw
-                    y2 = y2 * rw
+                            print(r)
+                            rh = orh / height
+                            rw = orw / width
+                            x1 = x1 * rh
+                            x2 = x2 * rh
+                            y1 = y1 * rw
+                            y2 = y2 * rw
 
-                    draw.rectangle(((y1, x1), (y2, x2)), outline="red")
-                    # draw.text((y2,x2), img_names[0])
-                    copyfile("./testsliceimage/"+img_names[0], "./goodimage/"+ img_names[0])
+                            draw.rectangle(((y1, x1), (y2, x2)), outline="red")
+                            # draw.text((y2,x2), img_names[0])
+                            copyfile("./testsliceimage/"+img_names[ite], "./goodimage/"+ img_names[ite])
 
         if width <= 200 or height <= 200:
             flag_continue = False
@@ -107,4 +113,4 @@ def searchfaces(net):
         os.makedirs("./testsliceimage")
 
     #slice_size is the max height of the slices in pixels
-    long_slice("./bigimage/237365221.jpg","papa", os.getcwd()+"/testsliceimage", 36, net)
+    long_slice(IMAGE_PATH,"nasa", os.getcwd()+"/testsliceimage", 36, net)

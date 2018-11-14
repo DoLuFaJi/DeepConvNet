@@ -25,19 +25,22 @@ CLASSIFIED_TEST_DATA_FACE = 'data/start_deep/face_posneg'
 CLASSIFIED_TEST_DATA_OTHER = 'data/start_deep/posneg_other'
 
 USE_TUTO = False
-SAVE_NOT_DETECTED = True
-SAVE_MODEL = True
+SAVE_NOT_DETECTED = False
+SAVE_MODEL = False
 MODEL_DIR = 'models/'
-LOAD_MODEL = False
+LOAD_MODEL = True
 
 SCHEDULER = False
 WORKERS = 1
 BATCH_SIZE = 16
-NB_ITERATIONS = 30
-MODEL_NAME = 'dodo'
+NB_ITERATIONS = 50
+MODEL_NAME = 'autostop'
 
 # LEARNING_RATE = 0.000001
 LEARNING_RATE = 0.01
 # MOMENTUM = 0.2
-# MOMENTUM = 0.5
-MOMENTUM = 0.9
+MOMENTUM = 0.5
+#MOMENTUM = 0.9
+
+IMAGE_PATH = "./bigimage/nasa.jpg"
+CONFIDENCE = 5.9
