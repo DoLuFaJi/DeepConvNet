@@ -14,10 +14,10 @@ Projet was made with python3.7
 
 ## For face dectetor in an image
 > `python extractor.py -d path_to_image [-c confidence]`
-The image resulting will be [./rectangle]
+The image resulting will be [./rectangle] (./rectangle)
 
 ## Report
-[[5IF][Deep]Dorian_Lefeuvre_Lucas_Marie_Fatima_Mezidi_Jiaye_Pu.pdf]
+[Report]([5IF][Deep]Dorian_Lefeuvre_Lucas_Marie_Fatima_Mezidi_Jiaye_Pu.pdf)
 
 
 ## Optional arguments details:
