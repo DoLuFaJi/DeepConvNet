@@ -3,20 +3,24 @@ Face recognition project with CNN
 
 Projet was made with python3.7
 
-Install
+## Install
 > `pip install -r requirements.txt`
 
-Run program
+## Run program
 > `python extractor.py [-b 16] [-lr 0.01] [-m 0.2] [-i 30] [-n model_name]`
 
-Load models
+## Load models
 > `python extractor.py -l model_name`
 
-For face dectetor in an image
+## For face dectetor in an image
 > `python extractor.py -d path_to_image [-c confidence]`
 The image resulting will be [./rectangle]
 
-Optional arguments:
+## Report
+[[5IF][Deep]Dorian_Lefeuvre_Lucas_Marie_Fatima_Mezidi_Jiaye_Pu.pdf]
+
+
+## Optional arguments details:
 - b B        Batch size
 - lr LR      Learning rate
 - m M        Momentum
